@@ -13,7 +13,8 @@ def load_data(ticker='BTC-USD', start_date='2017-01-01', end_date='2024-01-01'):
 data = yf.download(ticker, start=start_date, end=end_date)
 data = data[['Close']] # Using closing prices only
 return data
-# Feature engineering: Adding technical indicators
+
+
 # Feature engineering: Adding technical indicators
 def add_technical_indicators(data):
     # Adding Moving Averages
@@ -29,7 +30,6 @@ def add_technical_indicators(data):
     data['RSI'] = 100 - (100 / (1 + rs))
 
     # Bollinger Bands
-    # Ensure both sides of the equation are Series (single column)
     data['BB_upper'] = data['SMA_50'] + 2 * data['Close'].rolling(window=50).std().squeeze()  # Add .squeeze() here
     data['BB_lower'] = data['SMA_50'] - 2 * data['Close'].rolling(window=50).std().squeeze()  # And here
 
