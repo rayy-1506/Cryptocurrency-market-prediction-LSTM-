@@ -14,24 +14,29 @@ data = yf.download(ticker, start=start_date, end=end_date)
 data = data[['Close']] # Using closing prices only
 return data
 # Feature engineering: Adding technical indicators
+# Feature engineering: Adding technical indicators
 def add_technical_indicators(data):
-# Adding Moving Averages
+    # Adding Moving Averages
     data['SMA_50'] = data['Close'].rolling(window=50).mean()
     data['SMA_200'] = data['Close'].rolling(window=200).mean()
 
     # Relative Strength Index (RSI)
-delta = data['Close'].diff()
-gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-rs = gain / loss
-data['RSI'] = 100 - (100 / (1 + rs))
+    delta = data['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    # Avoid division by zero
+    rs = gain / (loss + 1e-10)  # add a small value
+    data['RSI'] = 100 - (100 / (1 + rs))
 
-# Bollinger Bands
-data['BB_upper'] = data['SMA_50'] + 2 * data['Close'].rolling(window=50).std()
-data['BB_lower'] = data['SMA_50'] - 2 * data['Close'].rolling(window=50).std()
-# Drop NA values created by rolling calculations
-data = data.dropna()
-return data
+    # Bollinger Bands
+    # Ensure both sides of the equation are Series (single column)
+    data['BB_upper'] = data['SMA_50'] + 2 * data['Close'].rolling(window=50).std().squeeze()  # Add .squeeze() here
+    data['BB_lower'] = data['SMA_50'] - 2 * data['Close'].rolling(window=50).std().squeeze()  # And here
+
+    # Drop NA values created by rolling calculations
+    data = data.dropna()
+
+    return data
 
 # Prepare data for LSTM (Reshape data to 3D)
 def create_dataset(data, time_step=60):
