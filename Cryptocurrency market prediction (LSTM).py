@@ -10,9 +10,9 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 # Load cryptocurrency data (e.g., Bitcoin data from Yahoo Finance)
 def load_data(ticker='BTC-USD', start_date='2017-01-01', end_date='2024-01-01'):
-data = yf.download(ticker, start=start_date, end=end_date)
-data = data[['Close']] # Using closing prices only
-return data
+  data = yf.download(ticker, start=start_date, end=end_date)
+  data = data[['Close']] # Using closing prices only
+  return data
 
 
 # Feature engineering: Adding technical indicators
@@ -40,11 +40,11 @@ def add_technical_indicators(data):
 
 # Prepare data for LSTM (Reshape data to 3D)
 def create_dataset(data, time_step=60):
-X, y = [], []
-for i in range(len(data) - time_step - 1):
-X.append(data[i:(i + time_step), :])
-y.append(data[i + time_step, 0]) # Target is the 'Close' price
-return np.array(X), np.array(y)
+    X, y = [], []
+    for i in range(len(data) - time_step - 1):
+        X.append(data[i:(i + time_step), :])
+        y.append(data[i + time_step, 0])  # Target is the 'Close' price
+    return np.array(X), np.array(y)
 
 # Load data
 data = load_data(ticker='BTC-USD', start_date='2017-01-01', end_date='2024-01-01')
